@@ -1,0 +1,63 @@
+CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
+        TYPE t_info_livre IS RECORD (
+        id                NUMBER,
+        titre             VARCHAR2(100),
+        isbn              VARCHAR2(50),
+        auteur            VARCHAR2(100),
+        maison_edition    VARCHAR2(100),
+        annee_publication NUMBER(4),
+        langage           VARCHAR2(50),
+        nom_section       VARCHAR2(100),
+        nom_genre         VARCHAR2(50)
+    );
+    g_annee_courante VARCHAR2(4) := '2020';
+    g_mois_courant   VARCHAR2(2) := '12';
+    e_livre_indisponible EXCEPTION;
+    e_penalites_impayees EXCEPTION;
+    -- Fonction A : est_penalites_impayees_fct
+    --
+    -- BUT : Vérifier si un membre à des frais à payer.
+    --
+    -- PARAMÈTRES :
+    -- id_membre (number) : id du membre
+    -- montant (number) : montant total des frais
+    --
+    -- RETOUR:
+    --BOOLEAN : True si membre a des frais sinon False.
+    --
+    -- EXCEPTIONS :
+    -- e_penalites_impayees: si le membre a ou a eu des retards
+
+    FUNCTION est_penalites_impayees_fct(
+        id_membre IN NUMBER,
+    -- 	e_penalites_impayees :
+        montant OUT NUMBER
+    ) RETURN BOOLEAN;
+    -- Procédure B : emprunter_livre_prc
+    --
+    -- BUT : Permet à un membre d'emprunter un livre
+    --
+    -- PARAMÈTRES :
+    -- id_membre (number) : id du membre
+    -- id_livre (number) : id du livre
+
+    PROCEDURE emprunter_livre_prc(
+        id_membre IN NUMBER,
+        id_livre  IN NUMBER
+    );
+    -- Fonction C : est_disponible_fct
+    --
+    -- BUT : Vérifie si le livre est disponible
+    --
+    -- PARAMÈTRES :
+    -- id_livre(number) : id du livre
+    --
+    -- RETOUR:
+    --BOOLEAN : True si livre disponible sinon false.
+    --
+    -- EXCEPTIONS :
+    --  e_livre_indisponible : Si livre non disponible.
+     Vérifie si un livre est disponible
+    FUNCTION est_disponible_fct(
+        id_livre IN NUMBER
+    ) RETURN BOOLEAN;
