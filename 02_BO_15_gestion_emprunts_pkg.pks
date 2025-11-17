@@ -57,7 +57,27 @@ CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
     --
     -- EXCEPTIONS :
     --  e_livre_indisponible : Si livre non disponible.
-     Vérifie si un livre est disponible
     FUNCTION est_disponible_fct(
         id_livre IN NUMBER
     ) RETURN BOOLEAN;
+
+
+
+    -- Procédure : est_disponible_fct
+    --
+    -- BUT : Vérifie si le livre est dispo pour emprunt aujourd'hui
+    --
+    -- PARAMETRES :
+    --  id_livre (IN NUMBER) : id du livre qu'on veut checker
+    --  date_retour_prevue (OUT DATE) : date prévue du retour si le livre est déjà emprunté
+    --
+    -- RETOUR :
+    --  BOOLEAN : TRUE si le livre est dispo, FALSE sinon
+    --
+    -- EXCEPTIONS :
+    --  e_livre_indisponible : si le livre est pas dispo
+    PROCEDURE retourner_livre_prc(
+        id_membre IN NUMBER,
+        id_livre  IN NUMBER
+    );
+   
