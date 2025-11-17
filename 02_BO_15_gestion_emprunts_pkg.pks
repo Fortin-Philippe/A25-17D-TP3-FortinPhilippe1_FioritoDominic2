@@ -57,9 +57,6 @@ CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
     --
     -- EXCEPTIONS :
     --  e_livre_indisponible : Si livre non disponible.
-    FUNCTION est_disponible_fct(
-        id_livre IN NUMBER
-    ) RETURN BOOLEAN;
     PROCEDURE retourner_livre_prc(
         id_membre IN NUMBER,
         id_livre  IN NUMBER
@@ -78,6 +75,7 @@ CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
     -- EXCEPTIONS :
     --  e_livre_indisponible : si le livre est pas dispo
 
+
     FUNCTION rechercher_livre_fct(
         id_livre IN OUT NUMBER
     ) RETURN t_info_livre;
@@ -93,4 +91,17 @@ CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
     --
     -- EXCEPTIONS :
     -- no_data_found : si aucun livre trouvé, retourne id = 0 et null
-   
+
+    -- avec la création de mon record ici
+     TYPE t_info_livre IS RECORD (
+        sections_id      livre.sections_id%TYPE,
+        auteurs_id       livre.auteurs_id%TYPE,
+        genres_id        livre.genres_id%TYPE,
+        isbn             livre.isbn%TYPE,
+        titre            livre.titre%TYPE,
+        maison_edition   livre.maison_edition%TYPE,
+        annee_publication livre.annee_publication%TYPE,
+        langage          livre.langage%TYPE,
+        prix             livre.prix%TYPE
+    );
+
