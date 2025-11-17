@@ -77,4 +77,20 @@ CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
     --
     -- EXCEPTIONS :
     --  e_livre_indisponible : si le livre est pas dispo
+
+    FUNCTION rechercher_livre_fct(
+        id_livre IN OUT NUMBER
+    ) RETURN t_info_livre;
+    -- Fonction E : rechercher_livre_fct
+    --
+    -- BUT : Recherche un livre selon l'id et retourne toutes ses infos dans un record
+    --
+    -- PARAMÈTRES :
+    -- id_livre (number) : id du livre à rechercher
+    --
+    -- RETOUR :
+    -- t_info_livre : record avec toutes les infos du livre, ou return 0 plus null
+    --
+    -- EXCEPTIONS :
+    -- no_data_found : si aucun livre trouvé, retourne id = 0 et null
    
