@@ -60,9 +60,10 @@ CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
     FUNCTION est_disponible_fct(
         id_livre IN NUMBER
     ) RETURN BOOLEAN;
-
-
-
+    PROCEDURE retourner_livre_prc(
+        id_membre IN NUMBER,
+        id_livre  IN NUMBER
+    );
     -- Procédure : est_disponible_fct
     --
     -- BUT : Vérifie si le livre est dispo pour emprunt aujourd'hui
@@ -76,8 +77,4 @@ CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
     --
     -- EXCEPTIONS :
     --  e_livre_indisponible : si le livre est pas dispo
-    PROCEDURE retourner_livre_prc(
-        id_membre IN NUMBER,
-        id_livre  IN NUMBER
-    );
    
