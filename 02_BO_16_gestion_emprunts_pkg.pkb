@@ -116,3 +116,20 @@ CREATE OR REPLACE PACKAGE BODY BO_10_gestion_emprunts_pkg IS
             DBMS_OUTPUT.PUT_LINE('Une erreur est survenue lors du retour du livre : ' || SQLERRM);
     END retourner_livre_prc;
 
+    ---- fonction E .
+
+    CREATE OR REPLACE FUNCTION rechercher_livre_fct(
+    id_livre IN OUT NUMBER
+    ) RETURN livre%ROWTYPE IS
+        v_livre livre%ROWTYPE;
+    BEGIN
+    SELECT * INTO v_livre FROM livre WHERE id = id_livre;
+
+    RETURN v_livre;
+
+    EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+            id_livre := 0;
+        RETURN NULL;
+    END rechercher_livre_fct;
+
