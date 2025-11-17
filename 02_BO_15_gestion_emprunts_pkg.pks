@@ -105,3 +105,22 @@ CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
         prix             livre.prix%TYPE
     );
 
+    -- procédure F : archiver_prc
+    --
+    -- BUT : d'archiver les emprunts par mois et par années dans de nouvelles tables
+    -- le nom des tables va être selon l'année et le mois (bo.emprunts_archive_202001)
+    --
+    -- PARAMÈTRES :
+    -- p_annee : l'anee courant par défaut
+    -- p_annee : et le mois courant par défaut
+    --
+    -- RETOUR :
+    -- juste une message que la table à été créer ou non
+    --
+    -- EXCEPTIONS :
+    -- message d'erreur si ça fonctionne pas
+    PROCEDURE archiver_prc(
+        p_annee IN NUMBER DEFAULT g_annee_courante,
+        p_mois  IN NUMBER DEFAULT g_mois_courant
+    );
+
