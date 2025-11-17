@@ -63,8 +63,9 @@ CREATE OR REPLACE PACKAGE BODY BO_10_gestion_emprunts_pkg IS
             DBMS_OUTPUT.PUT_LINE('Emprunt refusé : livre '||id_livre||' indisponible');
         WHEN OTHERS THEN
             DBMS_OUTPUT.PUT_LINE('Erreur inattendue dans emprunter_livre_prc : '||SQLERRM);
+    END emprunter_livre_prc;
 
-FUNCTION est_disponible_fct(
+    FUNCTION est_disponible_fct(
         i_id_livre IN NUMBER
     ) RETURN BOOLEAN IS
         v_nb_emprunts_actifs NUMBER := 0;
@@ -90,4 +91,28 @@ FUNCTION est_disponible_fct(
             RETURN FALSE;
     END est_disponible_fct;
 
-    END emprunter_livre_prc;
+    ---- procédure D
+
+    PROCEDURE retourner_livre_prc(
+        id_membre IN NUMBER,
+        id_livre  IN NUMBER
+    ) IS
+    v_montant NUMBER;
+    BEGIN
+        UPDATE bo.emprunts
+        SET date_retour = SYSDATE
+        WHERE id_membre = id_membre
+         AND id_livre  = id_livre
+         AND date_retour IS NULL;
+
+        DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' date mise à jour.');
+
+    IF est_penalites_impayees_fct(id_membre, v_montant) THEN
+        DBMS_OUTPUT.PUT_LINE('ERREUR !!! : vous avez des pénalites pour une maivaise remise à la date prévus du montant de : ' || v_montant || ' $');
+    END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Une erreur est survenue lors du retour du livre : ' || SQLERRM);
+    END retourner_livre_prc;
+
