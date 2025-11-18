@@ -1,15 +1,16 @@
 CREATE OR REPLACE PACKAGE gestion_emprunts_pkg IS
-       TYPE t_info_livre IS RECORD (
-    sections_id       livres.sections_id%TYPE,
-    auteurs_id        livres.auteurs_id%TYPE,
-    genres_id         livres.genres_id%TYPE,
-    isbn              livres.isbn%TYPE,
-    titre             livres.titre%TYPE,
-    maison_edition    livres.maison_edition%TYPE,
-    annee_publication livres.annee_publication%TYPE,
-    langage           livres.langage%TYPE,
-    prix              livres.prix%TYPE
-);
+    TYPE t_info_livre IS RECORD (
+        id                bo.livres.id%TYPE,
+        titre             bo.livres.titre%TYPE,
+        isbn              bo.livres.isbn%TYPE,
+        auteur            bo.auteurs.nom_auteur%TYPE,
+        maison_edition    bo.livres.maison_edition%TYPE,
+        annee_publication bo.livres.annee_publication%TYPE,
+        langage           bo.livres.langage%TYPE,
+        nom_section       bo.sections.nom%TYPE,
+        nom_genre         bo.genres.nom_genre%TYPE,
+        prix              bo.livres.prix%TYPE
+    );
     g_annee_courante VARCHAR2(4) := '2020';
     g_mois_courant   VARCHAR2(2) := '12';
     e_livre_indisponible EXCEPTION;
@@ -56,35 +57,32 @@ FUNCTION est_penalites_impayees_fct(
     --
     -- EXCEPTIONS :
     --  e_livre_indisponible : Si livre non disponible.
-    PROCEDURE retourner_livre_prc(
-        id_membre IN NUMBER,
-        id_livre  IN NUMBER
-    );
-    -- Procédure : est_disponible_fct
+    FUNCTION est_disponible_fct(
+        i_id_livre IN NUMBER,
+        o_date_retour_prevue OUT DATE
+)   RETURN BOOLEAN;
+
+    -- Procédure D: retourner_livre_fct
     --
-    -- BUT : Vérifie si le livre est dispo pour emprunt aujourd'hui
+    -- BUT : Recherche et modifie la valeur de retour dans l'enregistrement
     --
     -- PARAMETRES :
-    --  id_livre (IN NUMBER) : id du livre qu'on veut checker
-    --  date_retour_prevue (OUT DATE) : date prévue du retour si le livre est déjà emprunté
-    --
-    -- RETOUR :
-    --  BOOLEAN : TRUE si le livre est dispo, FALSE sinon
+    --  id_membre (IN NUMBER) : id du membre
+    --  id_livre (IN NUMBER): id du livre
     --
     -- EXCEPTIONS :
     --  e_livre_indisponible : si le livre est pas dispo
-    FUNCTION est_disponible_fct(
-    i_id_livre IN NUMBER
-)   RETURN BOOLEAN;
-
-
+PROCEDURE retourner_livre_prc(
+        id_membre IN NUMBER,
+        id_livre  IN NUMBER
+    );
 
     -- Fonction E : rechercher_livre_fct
     --
     -- BUT : Recherche un livre selon l'id et retourne toutes ses infos dans un record
     --
     -- PARAMÈTRES :
-    -- id_livre (number) : id du livre à rechercher
+    -- io_id_livre (number) : id du livre à rechercher
     --
     -- RETOUR :
     -- t_info_livre : record avec toutes les infos du livre, ou return 0 plus null
@@ -92,8 +90,8 @@ FUNCTION est_penalites_impayees_fct(
     -- EXCEPTIONS :
     -- no_data_found : si aucun livre trouvé, retourne id = 0 et null
   FUNCTION rechercher_livre_fct(
-    id_livre IN NUMBER
-) RETURN bo.livres%ROWTYPE;
+        io_id_livre IN OUT NUMBER)
+      RETURN t_info_livre;
 
     -- procédure F : archiver_prc
     --
@@ -101,12 +99,8 @@ FUNCTION est_penalites_impayees_fct(
     -- le nom des tables va être selon l'année et le mois (bo.emprunts_archive_202001)
     --
     -- PARAMÈTRES :
-    -- p_annee : l'anee courant par défaut
+    -- p_annee : l'annee courant par défaut
     -- p_annee : et le mois courant par défaut
-    --
-    -- RETOUR :
-    -- juste une message que la table à été créer ou non
-    --
     -- EXCEPTIONS :
     -- message d'erreur si ça fonctionne pas
     PROCEDURE archiver_prc(

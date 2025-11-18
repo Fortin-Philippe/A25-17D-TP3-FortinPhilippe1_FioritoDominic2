@@ -35,13 +35,14 @@ CREATE OR REPLACE PACKAGE BODY gestion_emprunts_pkg IS
         v_montant NUMBER;
         v_penalites BOOLEAN;
         v_dispo BOOLEAN;
+        v_date_retour_prevue DATE;
     BEGIN
         v_penalites := est_penalites_impayees_fct(id_membre, v_montant);
         IF v_penalites THEN
             RAISE e_penalites_impayees;
         END IF;
 
-        v_dispo := est_disponible_fct(id_livre);
+        v_dispo := est_disponible_fct(id_livre, v_date_retour_prevue);
         IF NOT v_dispo THEN
             RAISE e_livre_indisponible;
         END IF;
@@ -60,24 +61,27 @@ CREATE OR REPLACE PACKAGE BODY gestion_emprunts_pkg IS
             DBMS_OUTPUT.PUT_LINE('Erreur inattendue dans emprunter_livre_prc : '||SQLERRM);
     END emprunter_livre_prc;
 
-    FUNCTION est_disponible_fct(
-        i_id_livre IN NUMBER
-    ) RETURN BOOLEAN IS
-        v_nb_emprunts_actifs NUMBER := 0;
-    BEGIN
-        SELECT COUNT(*)
-        INTO v_nb_emprunts_actifs
-        FROM bo.emprunts
-        WHERE livres_id = i_id_livre
-          AND date_retour IS NULL;
+FUNCTION est_disponible_fct(
+    i_id_livre IN NUMBER,
+    o_date_retour_prevue OUT DATE
+) RETURN BOOLEAN IS
+    v_nb_emprunts_actifs NUMBER := 0;
+BEGIN
+    SELECT MIN(date_retour_prevu)
+    INTO o_date_retour_prevue
+    FROM bo.emprunts
+    WHERE livres_id = i_id_livre
+      AND date_retour IS NULL;
 
-        RETURN (v_nb_emprunts_actifs = 0);
-
-    EXCEPTION
-        WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Erreur inattendue dans est_disponible_fct : '||SQLERRM);
-            RETURN FALSE;
-    END est_disponible_fct;
+    RETURN (o_date_retour_prevue IS NULL);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        o_date_retour_prevue := NULL;
+        RETURN TRUE;
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erreur inattendue dans est_disponible_fct : '||SQLERRM);
+        RETURN FALSE;
+END est_disponible_fct;
 
     PROCEDURE retourner_livre_prc(
         id_membre IN NUMBER,
@@ -102,28 +106,56 @@ CREATE OR REPLACE PACKAGE BODY gestion_emprunts_pkg IS
             DBMS_OUTPUT.PUT_LINE('Erreur lors du retour du livre : '||SQLERRM);
     END retourner_livre_prc;
 
-    FUNCTION rechercher_livre_fct(
-        id_livre IN NUMBER
-    ) RETURN bo.livres%ROWTYPE IS
-        v_livre bo.livres%ROWTYPE;
-    BEGIN
-        SELECT * INTO v_livre
-        FROM bo.livres
-        WHERE id = id_livre;
+FUNCTION rechercher_livre_fct(
+    io_id_livre IN OUT NUMBER
+) RETURN t_info_livre IS
+    v_info t_info_livre;
+BEGIN
+        SELECT l.id,
+           l.titre,
+           l.isbn,
+           a.nom_auteur AS auteur,
+           l.maison_edition,
+           l.annee_publication,
+           l.langage,
+           s.nom AS nom_section,
+           g.nom_genre AS nom_genre,
+           l.prix
+    INTO v_info
+    FROM bo.livres   l
+    JOIN bo.auteurs  a ON a.id = l.auteurs_id
+    JOIN bo.sections s ON s.id = l.sections_id
+    JOIN bo.genres   g ON g.id = l.genres_id
+    WHERE l.id = io_id_livre;
 
-        RETURN v_livre;
+    RETURN v_info;
 
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
-        v_livre.id := 0;
-        RETURN v_livre;
+        io_id_livre := 0;
+        v_info.id                := 0;
+        v_info.titre             := NULL;
+        v_info.isbn              := NULL;
+        v_info.auteur            := NULL;
+        v_info.maison_edition    := NULL;
+        v_info.annee_publication := NULL;
+        v_info.langage           := NULL;
+        v_info.nom_section       := NULL;
+        v_info.nom_genre         := NULL;
+        RETURN v_info;
 END rechercher_livre_fct;
 PROCEDURE archiver_prc(
     p_annee IN NUMBER,
     p_mois  IN NUMBER
 ) IS
+    v_table_name VARCHAR2(50);
 BEGIN
-    DBMS_OUTPUT.PUT_LINE('Archive '||p_annee||LPAD(p_mois,2,'0')||' créée (simulation).');
+    v_table_name := 'bo.emprunts_archive_'||p_annee||LPAD(p_mois,2,'0');
+    EXECUTE IMMEDIATE 'CREATE TABLE '||v_table_name||' AS SELECT * FROM bo.emprunts WHERE TO_CHAR(date_emprunt,''YYYYMM'') = '''||p_annee||LPAD(p_mois,2,'0')||'''';
+    DBMS_OUTPUT.PUT_LINE('Archive '||v_table_name||' créée.');
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erreur lors de l''archivage : '||SQLERRM);
 END archiver_prc;
 
 END gestion_emprunts_pkg;
