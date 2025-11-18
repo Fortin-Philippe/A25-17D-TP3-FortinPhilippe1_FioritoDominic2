@@ -1,15 +1,15 @@
 CREATE OR REPLACE PACKAGE gestion_emprunts_pkg IS
-        TYPE t_info_livre IS RECORD (
-        id                NUMBER,
-        titre             VARCHAR2(100),
-        isbn              VARCHAR2(50),
-        auteur            VARCHAR2(100),
-        maison_edition    VARCHAR2(100),
-        annee_publication NUMBER(4),
-        langage           VARCHAR2(50),
-        nom_section       VARCHAR2(100),
-        nom_genre         VARCHAR2(50)
-    );
+       TYPE t_info_livre IS RECORD (
+    sections_id       livres.sections_id%TYPE,
+    auteurs_id        livres.auteurs_id%TYPE,
+    genres_id         livres.genres_id%TYPE,
+    isbn              livres.isbn%TYPE,
+    titre             livres.titre%TYPE,
+    maison_edition    livres.maison_edition%TYPE,
+    annee_publication livres.annee_publication%TYPE,
+    langage           livres.langage%TYPE,
+    prix              livres.prix%TYPE
+);
     g_annee_courante VARCHAR2(4) := '2020';
     g_mois_courant   VARCHAR2(2) := '12';
     e_livre_indisponible EXCEPTION;
@@ -28,11 +28,10 @@ CREATE OR REPLACE PACKAGE gestion_emprunts_pkg IS
     -- EXCEPTIONS :
     -- e_penalites_impayees: si le membre a ou a eu des retards
 
-    FUNCTION est_penalites_impayees_fct(
-        id_membre IN NUMBER,
-    -- 	e_penalites_impayees :
-        montant OUT NUMBER
-    ) RETURN BOOLEAN;
+FUNCTION est_penalites_impayees_fct(
+    i_id_membre IN NUMBER,
+    o_montant   OUT NUMBER
+) RETURN BOOLEAN;
     -- Procédure B : emprunter_livre_prc
     --
     -- BUT : Permet à un membre d'emprunter un livre
@@ -74,11 +73,12 @@ CREATE OR REPLACE PACKAGE gestion_emprunts_pkg IS
     --
     -- EXCEPTIONS :
     --  e_livre_indisponible : si le livre est pas dispo
+    FUNCTION est_disponible_fct(
+    i_id_livre IN NUMBER
+)   RETURN BOOLEAN;
 
 
-    FUNCTION rechercher_livre_fct(
-        id_livre IN OUT NUMBER
-    ) RETURN t_info_livre;
+
     -- Fonction E : rechercher_livre_fct
     --
     -- BUT : Recherche un livre selon l'id et retourne toutes ses infos dans un record
@@ -91,19 +91,9 @@ CREATE OR REPLACE PACKAGE gestion_emprunts_pkg IS
     --
     -- EXCEPTIONS :
     -- no_data_found : si aucun livre trouvé, retourne id = 0 et null
-
-    -- avec la création de mon record ici
-     TYPE t_info_livre IS RECORD (
-        sections_id      livre.sections_id%TYPE,
-        auteurs_id       livre.auteurs_id%TYPE,
-        genres_id        livre.genres_id%TYPE,
-        isbn             livre.isbn%TYPE,
-        titre            livre.titre%TYPE,
-        maison_edition   livre.maison_edition%TYPE,
-        annee_publication livre.annee_publication%TYPE,
-        langage          livre.langage%TYPE,
-        prix             livre.prix%TYPE
-    );
+  FUNCTION rechercher_livre_fct(
+    id_livre IN NUMBER
+) RETURN bo.livres%ROWTYPE;
 
     -- procédure F : archiver_prc
     --

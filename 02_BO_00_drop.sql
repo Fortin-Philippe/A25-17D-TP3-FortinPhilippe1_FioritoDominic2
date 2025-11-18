@@ -11,7 +11,7 @@ DECLARE
     );
 
     v_lst_tables t_liste := t_liste('EMPRUNTS','LIVRES','GENRES','MEMBRES','AUTEURS','SECTIONS');
-    v_lst_sequences t_liste := t_liste('SEQUENCE_MEMBRES');
+    v_lst_sequences t_liste := t_liste('CODE_MEMBRE_SEQ');
 
 BEGIN
     DBMS_OUTPUT.PUT_LINE('Suppression des contraintes');
