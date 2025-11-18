@@ -50,8 +50,8 @@ FUNCTION est_penalites_impayees_fct(
     -- BUT : Vérifie si le livre est disponible
     --
     -- PARAMÈTRES :
-    -- id_livre(number) : id du livre
-    --
+    -- i_id_livre(number) : id du livre (IN)
+    --0_date_retour_prevue : Date de retour (OUT)
     -- RETOUR:
     --BOOLEAN : True si livre disponible sinon false.
     --
