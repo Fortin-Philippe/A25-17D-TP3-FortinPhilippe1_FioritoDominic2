@@ -68,8 +68,8 @@ CREATE TABLE bo.membres(
     statut_membre VARCHAR2(15),
     theme_prefere VARCHAR2(15)
 );
-CREATE SEQUENCE bo.sequence_membres
-    INCREMENT BY 5
+CREATE SEQUENCE bo.code_membre_seq
+  INCREMENT BY 5
     START WITH 5
     MAXVALUE 10000
     NOCYCLE;

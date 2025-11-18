@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE BODY BO_10_gestion_emprunts_pkg IS
+CREATE OR REPLACE PACKAGE BODY gestion_emprunts_pkg IS
        -- Fonction A
     FUNCTION est_penalites_impayees_fct(
         i_id_membre IN NUMBER,
@@ -132,4 +132,5 @@ CREATE OR REPLACE PACKAGE BODY BO_10_gestion_emprunts_pkg IS
             id_livre := 0;
         RETURN NULL;
     END rechercher_livre_fct;
+END gestion_emprunts_pkg;
 

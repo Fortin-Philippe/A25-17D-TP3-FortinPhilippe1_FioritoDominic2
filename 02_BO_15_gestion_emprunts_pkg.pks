@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
+CREATE OR REPLACE PACKAGE gestion_emprunts_pkg IS
         TYPE t_info_livre IS RECORD (
         id                NUMBER,
         titre             VARCHAR2(100),
@@ -124,3 +124,4 @@ CREATE OR REPLACE PACKAGE BO_10_gestion_emprunts_pkg IS
         p_mois  IN NUMBER DEFAULT g_mois_courant
     );
 
+END gestion_emprunts_pkg;

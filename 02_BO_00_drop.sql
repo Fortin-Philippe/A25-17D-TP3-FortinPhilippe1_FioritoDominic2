@@ -14,7 +14,7 @@ DECLARE
     v_lst_sequences t_liste := t_liste('SEQUENCE_MEMBRES');
 
 BEGIN
-    PROMPT Suppression des contraintes;
+    DBMS_OUTPUT.PUT_LINE('Suppression des contraintes');
 
     FOR i IN 1 .. v_lst_contraintes.COUNT LOOP
         BEGIN
@@ -33,7 +33,7 @@ BEGIN
         END;
     END LOOP;
 
-    PROMPT Suppression des tables;
+    DBMS_OUTPUT.PUT_LINE('Suppression des tables');
 
     FOR i IN 1 .. v_lst_tables.COUNT LOOP
         BEGIN
@@ -42,7 +42,7 @@ BEGIN
         END;
     END LOOP;
 
-    PROMPT Suppression des séquences;
+   DBMS_OUTPUT.PUT_LINE('Suppression des séquences');
 
     FOR i IN 1 .. v_lst_sequences.COUNT LOOP
         BEGIN
@@ -51,7 +51,7 @@ BEGIN
         END;
     END LOOP;
 
-    PROMPT La BD a été supprimée !
+DBMS_OUTPUT.PUT_LINE('BD supprimée !');
 
 EXCEPTION
     WHEN OTHERS THEN
