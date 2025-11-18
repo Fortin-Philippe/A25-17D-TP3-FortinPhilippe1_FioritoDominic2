@@ -6,7 +6,7 @@ Projet qui consiste à se familiarisé avec le PL/SQL avec la création de packa
 Le dossier contient les fichiers nécessaires de l'approche modulaire, une fichier pks ainsi qu'un fichier pkb du package gestion_emprunts ainsi qu'un fichier de test
 
 ## ÉQUIPE
-Lettre d’équipe : Z
+Lettre d’équipe : D
 Étudiant 1 : Philippe Fortin
 Étudiant 2 : Dominic Fiorito
 
